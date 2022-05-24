@@ -45,13 +45,13 @@ Para realização de testes e validação do código:
 
 ```bash
 # Para testar os requisitos
-$ npm test
+$ npm run test
 
 #Para testar a cobertura do teste
-$ npm test:coverage
+$ npm run test:coverage
 
 #Para validação do código pelo Eslint
-$ npm lint
+$ npm run lint
 ```
 
 ### 🛠 Tecnologias utilizadas
