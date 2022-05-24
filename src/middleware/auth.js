@@ -1,23 +1,8 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const { MongoClient, ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
+const RecipeModel = require('../models/RecipeModel');
 
-const MONGO_DB_URL = `mongodb://${process.env.HOST || 'mongodb'}:27017/Cookmaster`;
-const DB_NAME = 'Cookmaster';
 const NOT_FOUND = 'recipe not found';
-
-async function connectBD(response) {
-    try {
-        const connection = await MongoClient.connect(MONGO_DB_URL,
-             { 
-                 useNewUrlParser: true, 
-                 useUnifiedTopology: true, 
-            });
-        return connection;
-    } catch (error) {
-        return response.status(500).json({ message: 'Server error' }); 
-    }  
-}
 
 module.exports = {
     async verifyJWT(req, res, next) {
@@ -57,17 +42,13 @@ module.exports = {
         const { id } = req.params;
         if (!ObjectId.isValid(id)) return res.status(404).json({ message: NOT_FOUND });
 
-        const connection = await connectBD(res);
-        const db = connection.db(DB_NAME);
-        
-        const result = await db.collection('recipes').find({ _id: new ObjectId(id) }).toArray();
-        await connection.close();
+        const result = await RecipeModel.listRecipes(id, res);
 
         if (result.length < 1) return res.status(404).json({ message: NOT_FOUND });
 
         const { _id: userId } = req.user;
 
-        if (req.user.role === 'admin' || result[0].userId === userId) {
+        if (req.user.role === 'admin' || result.userId === userId) {
             next();
         } else {
             return res.status(401).json({ message: 'missing auth token' });

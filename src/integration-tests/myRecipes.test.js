@@ -332,6 +332,7 @@ describe('Testes relacionados a edição de receitas', () => {
         .set('Authorization',token)
         .send(newRecipe)
         .end((err, res) => {
+          console.log(res)
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('preparation').equals('Mistura e vai pro fogo baixo');
